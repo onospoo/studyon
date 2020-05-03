@@ -1,0 +1,12 @@
+spring:
+  data:
+    mongodb:
+      host: ${ARANGO_HOST:3.19.63.58}
+      port: 27017
+      database: studyon
+      username: root
+      password: root
+      authentication-database: admin
+
+server:
+  port: 8080
