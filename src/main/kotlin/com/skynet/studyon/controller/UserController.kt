@@ -2,6 +2,7 @@ package com.skynet.studyon.controller
 
 import com.skynet.studyon.dto.UserDto
 import com.skynet.studyon.model.User
+import com.skynet.studyon.dto.Account
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -53,4 +54,16 @@ interface UserController {
             @PathVariable(name = "id", required = true)
             id: String
     ) : ResponseEntity<String>
+
+    @ApiOperation("Привязать учебный аккаунт")
+    @PostMapping("/{id}/account")
+    fun addAccountToUser(
+            @ApiParam("ID пользователя")
+            @PathVariable(name = "id", required = true)
+            id: String,
+
+            @ApiParam("Информация об аккаунте")
+            @RequestBody(required = true)
+            accountList: List<Account>
+    ) : ResponseEntity<Boolean>
 }

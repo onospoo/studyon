@@ -1,4 +1,4 @@
-package com.skynet.studyon.model
+package com.skynet.studyon.dto
 
 import com.skynet.studyon.model.inner.AccountService
 
@@ -6,5 +6,5 @@ class Account(
 
         val accountService: AccountService,
 
-        val link: String
-) : BaseDocument()
+        val authorizationCode: String
+)

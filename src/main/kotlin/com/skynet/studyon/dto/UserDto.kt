@@ -10,8 +10,11 @@ data class UserDto(
         val gender: Gender?,
         val country: String?,
         val city: String?,
+        val email: String?,
+        val zoomId: String?,
         val grade: String?,
-        val isTeacher: Boolean = false
+        val directions: HashSet<String>?,
+        val isTeacher: Boolean?
 ) {
 
     fun toEntity(): User =
@@ -21,7 +24,10 @@ data class UserDto(
                     gender = this.gender ?: Gender.MAN,
                     country = this.country ?: "",
                     city = this.city ?: "",
+                    email = this.email,
+                    zoomId = this.zoomId,
                     grade = this.grade,
-                    isTeacher = this.isTeacher
+                    directions = this.directions ?: hashSetOf(),
+                    isTeacher = this.isTeacher ?: false
             )
 }

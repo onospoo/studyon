@@ -1,6 +1,7 @@
 package com.skynet.studyon.controller.impl
 
 import com.skynet.studyon.controller.UserController
+import com.skynet.studyon.dto.Account
 import com.skynet.studyon.dto.UserDto
 import com.skynet.studyon.model.User
 import com.skynet.studyon.service.StudyService
@@ -27,4 +28,7 @@ class UserControllerImpl(
 
     override fun deleteUser(id: String): ResponseEntity<String> =
             ResponseEntity.ok(studyService.deleteUser(id))
+
+    override fun addAccountToUser(id: String, accountList: List<Account>): ResponseEntity<Boolean> =
+            ResponseEntity.ok(studyService.addAccountToUser(id, accountList))
 }

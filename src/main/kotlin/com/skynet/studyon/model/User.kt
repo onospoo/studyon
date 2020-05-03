@@ -1,34 +1,42 @@
 package com.skynet.studyon.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.skynet.studyon.model.inner.AccountService
 import com.skynet.studyon.model.inner.Gender
 import org.springframework.data.mongodb.core.mapping.Document
+import java.math.BigDecimal
 import java.time.LocalDate
 
 
 @Document("user")
 class User(
 
-     var name: String,
+        var name: String,
 
-     var dateOfBirth: LocalDate,
+        var dateOfBirth: LocalDate,
 
-     var gender: Gender,
+        var gender: Gender,
 
-     var country: String,
+        var country: String,
 
-     var city: String,
+        var city: String,
 
-     var grade: String?,
+        var grade: String?,
 
-     val interests: List<String> = mutableListOf(),
+        var email: String?,
 
-     @JsonIgnore
-     val accounts: List<Account> = mutableListOf(),
+        var zoomId: String?,
 
-     var isTeacher: Boolean = false,
+        @JsonIgnore
+        val dt: BigDecimal = BigDecimal(0),
 
-     @JsonIgnore
-     val achievements: List<Achievement> = mutableListOf()
+        val directions: HashSet<String> = hashSetOf(),
+
+        val accounts: HashMap<AccountService, String> = hashMapOf(),
+
+        var isTeacher: Boolean = false,
+
+        @JsonIgnore
+        val achievements: MutableList<Achievement> = mutableListOf()
 
 ) : BaseDocument()
