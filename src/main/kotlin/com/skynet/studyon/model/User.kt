@@ -1,5 +1,6 @@
 package com.skynet.studyon.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.skynet.studyon.model.inner.Gender
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDate
@@ -8,23 +9,26 @@ import java.time.LocalDate
 @Document("user")
 class User(
 
-     val name: String,
+     var name: String,
 
-     val dateOfBirth: LocalDate,
+     var dateOfBirth: LocalDate,
 
-     val gender: Gender,
+     var gender: Gender,
 
-     val country: String,
+     var country: String,
 
-     val city: String,
+     var city: String,
 
-     val grade: String,
+     var grade: String?,
 
-     val interests: List<String>,
+     val interests: List<String> = mutableListOf(),
 
-     val accounts: List<Account>,
+     @JsonIgnore
+     val accounts: List<Account> = mutableListOf(),
 
-     val isTeacher: Boolean = false,
+     var isTeacher: Boolean = false,
 
-     val achievements: List<Achievement>
+     @JsonIgnore
+     val achievements: List<Achievement> = mutableListOf()
+
 ) : BaseDocument()
