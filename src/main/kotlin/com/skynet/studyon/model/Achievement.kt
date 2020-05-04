@@ -1,15 +1,16 @@
 package com.skynet.studyon.model
 
 import com.skynet.studyon.model.inner.Stage
+import java.math.BigDecimal
 
 class Achievement(
-        val name: String,
+        var name: String,
 
-        val reward: String,
+        var description: String,
 
-        val isComplete: Boolean = false,
+        var reward: BigDecimal,
 
         val stages: List<Stage>,
 
-        val logo: ByteArray?
+        var logoLink: String?
 ) : BaseDocument()

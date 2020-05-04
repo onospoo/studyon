@@ -1,8 +1,8 @@
 package com.skynet.studyon.controller
 
+import com.skynet.studyon.dto.Account
 import com.skynet.studyon.dto.UserDto
 import com.skynet.studyon.model.User
-import com.skynet.studyon.dto.Account
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
@@ -66,4 +66,24 @@ interface UserController {
             @RequestBody(required = true)
             accountList: List<Account>
     ) : ResponseEntity<Boolean>
+
+    @ApiOperation("Добавить ачивку в работу пользователю")
+    @PostMapping("/{id}/achievement/{achievementId}")
+    fun addAchievementInWork(
+            @ApiParam("ID пользователя")
+            @PathVariable(name = "id", required = true)
+            id: String,
+
+            @ApiParam("ID ачивки")
+            @PathVariable(name = "achievementId", required = true)
+            achievementId: String
+    ) : ResponseEntity<Boolean>
+
+    @ApiOperation("Информация об ачивка пользователя")
+    @GetMapping("/{id}/achievement")
+    fun getUserAchievements(
+            @ApiParam("ID пользователя")
+            @PathVariable(name = "id", required = true)
+            id: String
+    ) : ResponseEntity<HashMap<String, Boolean>>
 }

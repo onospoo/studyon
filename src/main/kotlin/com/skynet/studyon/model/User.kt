@@ -28,7 +28,7 @@ class User(
         var zoomId: String?,
 
         @JsonIgnore
-        val dt: BigDecimal = BigDecimal(0),
+        val kt: BigDecimal = BigDecimal(0),
 
         val directions: HashSet<String> = hashSetOf(),
 
@@ -37,6 +37,6 @@ class User(
         var isTeacher: Boolean = false,
 
         @JsonIgnore
-        val achievements: MutableList<Achievement> = mutableListOf()
+        val achievements: HashMap<String, Boolean> = hashMapOf()
 
 ) : BaseDocument()

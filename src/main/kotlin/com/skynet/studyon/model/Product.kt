@@ -5,7 +5,7 @@ class Product(
 
         val name: String,
 
-        val descrtiption: String,
+        val description: String,
 
         val price: String,
 

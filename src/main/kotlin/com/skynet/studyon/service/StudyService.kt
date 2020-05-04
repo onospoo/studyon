@@ -1,16 +1,26 @@
 package com.skynet.studyon.service
 
+import com.skynet.studyon.dto.Account
+import com.skynet.studyon.dto.AchievementDto
 import com.skynet.studyon.dto.UserDto
 import com.skynet.studyon.exception.BusinessException
+import com.skynet.studyon.model.Achievement
 import com.skynet.studyon.model.User
-import com.skynet.studyon.dto.Account
+import com.skynet.studyon.model.inner.AccountService
+import com.skynet.studyon.repositories.AchievementRepository
 import com.skynet.studyon.repositories.UserRepository
 import org.springframework.stereotype.Service
 
 @Service
 class StudyService(
-        private val userRepository: UserRepository
+        private val userRepository: UserRepository,
+        private val achievementRepository: AchievementRepository
 ) {
+
+    /**
+     * Кэш пройденных курсов
+     */
+    val courseCache: HashMap<String, MutableSet<String>> = hashMapOf()
 
     /**
      * Работа с пользователями
@@ -78,4 +88,70 @@ class StudyService(
 
         return true
     }
+
+    fun addAchievementInWorkToUser(userId: String, achievementId: String) : Boolean {
+        achievementRepository
+                .findById(achievementId)
+                .map {
+                    userRepository
+                            .findById(userId)
+                            .map {
+                                if (it.achievements.containsKey(achievementId)) {
+                                    throw BusinessException("Пользователь уже выполняет данную ачивку")
+                                } else {
+                                    it.achievements[achievementId] = false
+                                    userRepository.save(it)
+                                }
+                            }.orElseThrow {
+                                BusinessException("Пользователя с таким id не существует")
+                            }
+                }.orElseThrow {
+                    BusinessException("Ачивки с таким id не существует")
+                }
+
+        return true
+    }
+
+    fun getUserAchievements(userId: String) :HashMap<String, Boolean> =
+            userRepository
+                    .findById(userId)
+                    .map { it.achievements }
+                    .orElse(hashMapOf())
+
+    /**
+     * Работа с ачивками
+     */
+    fun createAchievement(achievementDto: AchievementDto) : String {
+        val achievement = achievementDto.toEntity()
+        achievementRepository.save(achievement)
+
+        return achievement.id.toString()
+    }
+
+    fun getAchievementList() : List<Achievement> =
+            achievementRepository.findAll()
+
+    fun getAchievementById(id: String) : Achievement =
+            achievementRepository
+                    .findById(id)
+                    .orElseThrow { BusinessException("Ачивки с таким id не существует") }
+
+    fun Achievement.checkProgress(user: User) : Boolean {
+        val userList = courseCache.getOrPut(user.id.toString()){ mutableSetOf() }
+        var isComplete = true
+        stages.forEach {
+            if (!userList.contains(it.id))  {
+                val result = getProgress(user.accounts[AccountService.STEPIK]!!, it.id)
+                if (result) {
+                    userList.add(it.id)
+                } else {
+                    isComplete = false
+                }
+            }
+        }
+
+        return isComplete
+    }
+
+    private fun getProgress(userCode: String, courseId: String) = true
 }

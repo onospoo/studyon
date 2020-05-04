@@ -31,4 +31,10 @@ class UserControllerImpl(
 
     override fun addAccountToUser(id: String, accountList: List<Account>): ResponseEntity<Boolean> =
             ResponseEntity.ok(studyService.addAccountToUser(id, accountList))
+
+    override fun addAchievementInWork(id: String, achievementId: String): ResponseEntity<Boolean> =
+            ResponseEntity.ok(studyService.addAchievementInWorkToUser(id, achievementId))
+
+    override fun getUserAchievements(id: String): ResponseEntity<HashMap<String, Boolean>> =
+            ResponseEntity.ok(studyService.getUserAchievements(id))
 }
