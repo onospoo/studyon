@@ -8,6 +8,7 @@ import com.skynet.studyon.model.User
 import com.skynet.studyon.model.inner.AccountService
 import com.skynet.studyon.repositories.AchievementRepository
 import com.skynet.studyon.repositories.UserRepository
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 
@@ -17,6 +18,9 @@ class StudyService(
         private val achievementRepository: AchievementRepository,
         private val restTemplate: RestTemplate
 ) {
+
+    @Value("\${app.python-service}")
+    lateinit var uriPython: String
 
     /**
      * Кэш пройденных курсов
@@ -74,7 +78,7 @@ class StudyService(
                         UserWithRating(
                                 id = it.id.toString(),
                                 name = it.name,
-                                rating = calculateRating(it)
+                                rating = getUserCountOfTasks(it.accounts[AccountService.STEPIK]!!)
                         )
                     }.toList()
                     .sortedByDescending { it.rating }
@@ -181,7 +185,7 @@ class StudyService(
     }
 
     private fun getProgress(userCode: String, courseList: List<String>) : List<CoursesResponse> {
-        val uri = "http://3.19.63.58:8087/api/v1/courses"
+        val uri = "$uriPython/api/v1/courses"
         val request = AchievementRequest(
                 provider = "stepik",
                 token = userCode,
@@ -194,6 +198,19 @@ class StudyService(
         return response?.courses ?: listOf()
     }
 
-    private fun calculateRating(user: User) =
-            user.achievements.count { it.value }
+    private fun getUserCountOfTasks(userCode: String) : Int {
+        val uri = "$uriPython/api/v1/courses"
+        val request = AchievementRequest(
+                provider = "stepik",
+                token = userCode,
+                ids = listOf(),
+                columns = listOf("id", "score")
+        )
+        val response: AchievementResponse? = restTemplate.postForObject(
+                uri, request, AchievementResponse::class.java
+        )
+
+        return response!!.courses.map { it.score!! }.sum()
+    }
+
 }

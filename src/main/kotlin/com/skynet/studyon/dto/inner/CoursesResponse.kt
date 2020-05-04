@@ -8,7 +8,8 @@ class CoursesResponse(
         var id: String,
         var title: String?,
         var description: String?,
-        var progress: Int?,
+        var score: Int?,
+        var cost: Int?,
         @JsonProperty("is_complete")
         var isComplete: Boolean
 )

@@ -2,6 +2,7 @@ FROM maven:3.6.3-jdk-11 AS builder
 WORKDIR /app
 
 ENV ARANGO_HOST=localhost
+ENV PYTHON_SERVICE=localhost
 
 COPY pom.xml .
 RUN mvn dependency:resolve
