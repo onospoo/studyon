@@ -1,8 +1,7 @@
 package com.skynet.studyon.service
 
-import com.skynet.studyon.dto.Account
-import com.skynet.studyon.dto.AchievementDto
-import com.skynet.studyon.dto.UserDto
+import com.skynet.studyon.dto.*
+import com.skynet.studyon.dto.inner.CoursesResponse
 import com.skynet.studyon.exception.BusinessException
 import com.skynet.studyon.model.Achievement
 import com.skynet.studyon.model.User
@@ -10,11 +9,13 @@ import com.skynet.studyon.model.inner.AccountService
 import com.skynet.studyon.repositories.AchievementRepository
 import com.skynet.studyon.repositories.UserRepository
 import org.springframework.stereotype.Service
+import org.springframework.web.client.RestTemplate
 
 @Service
 class StudyService(
         private val userRepository: UserRepository,
-        private val achievementRepository: AchievementRepository
+        private val achievementRepository: AchievementRepository,
+        private val restTemplate: RestTemplate
 ) {
 
     /**
@@ -67,6 +68,18 @@ class StudyService(
     fun getUsersList() : List<User> =
             userRepository.findAll()
 
+    fun getUserListByRating() : List<UserWithRating> =
+            getUsersList()
+                    .map {
+                        UserWithRating(
+                                id = it.id.toString(),
+                                name = it.name,
+                                rating = calculateRating(it)
+                        )
+                    }.toList()
+                    .sortedByDescending { it.rating }
+
+
     fun getUserById(id: String) : User =
             userRepository
                     .findById(id)
@@ -112,11 +125,21 @@ class StudyService(
         return true
     }
 
-    fun getUserAchievements(userId: String) :HashMap<String, Boolean> =
-            userRepository
-                    .findById(userId)
-                    .map { it.achievements }
-                    .orElse(hashMapOf())
+    fun getUserAchievements(userId: String) :HashMap<String, Boolean> {
+        val user = getUserById(userId)
+        if (user.accounts.containsKey(AccountService.STEPIK)) {
+            user.achievements.map { (k, _) ->
+                user.achievements[k] = achievementRepository
+                        .findById(k)
+                        .map {
+                            it.checkProgress(user)
+                        }.orElse(false)
+            }
+            userRepository.save(user)
+        }
+
+        return user.achievements
+    }
 
     /**
      * Работа с ачивками
@@ -139,10 +162,14 @@ class StudyService(
     fun Achievement.checkProgress(user: User) : Boolean {
         val userList = courseCache.getOrPut(user.id.toString()){ mutableSetOf() }
         var isComplete = true
-        stages.forEach {
-            if (!userList.contains(it.id))  {
-                val result = getProgress(user.accounts[AccountService.STEPIK]!!, it.id)
-                if (result) {
+        val listId = stages.map{it.id}
+
+        if ( listId.all { it in userList }) {
+            return isComplete
+        } else {
+            val result = getProgress(user.accounts[AccountService.STEPIK]!!, listId)
+            result.forEach {
+                if (it.isComplete) {
                     userList.add(it.id)
                 } else {
                     isComplete = false
@@ -153,5 +180,20 @@ class StudyService(
         return isComplete
     }
 
-    private fun getProgress(userCode: String, courseId: String) = true
+    private fun getProgress(userCode: String, courseList: List<String>) : List<CoursesResponse> {
+        val uri = "http://3.19.63.58:8087/api/v1/courses"
+        val request = AchievementRequest(
+                provider = "stepik",
+                token = userCode,
+                ids = courseList,
+                columns = listOf("id", "is_complete")
+        )
+        val response: AchievementResponse? = restTemplate.postForObject(
+                uri, request, AchievementResponse::class.java
+        )
+        return response?.courses ?: listOf()
+    }
+
+    private fun calculateRating(user: User) =
+            user.achievements.count { it.value }
 }

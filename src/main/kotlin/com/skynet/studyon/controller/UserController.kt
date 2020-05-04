@@ -2,6 +2,7 @@ package com.skynet.studyon.controller
 
 import com.skynet.studyon.dto.Account
 import com.skynet.studyon.dto.UserDto
+import com.skynet.studyon.dto.UserWithRating
 import com.skynet.studyon.model.User
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -26,6 +27,10 @@ interface UserController {
     @ApiOperation("Получить всех пользователей")
     @GetMapping("/list")
     fun getUsersList() : ResponseEntity<List<User>>
+
+    @ApiOperation("Получить пользователей отсортированных по рейтингу")
+    @GetMapping("/rating")
+    fun gerUsersListByRating() : ResponseEntity<List<UserWithRating>>
 
     @ApiOperation("Получить пользователя по ID")
     @GetMapping("/{id}")

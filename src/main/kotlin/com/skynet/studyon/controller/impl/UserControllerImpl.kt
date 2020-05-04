@@ -3,6 +3,7 @@ package com.skynet.studyon.controller.impl
 import com.skynet.studyon.controller.UserController
 import com.skynet.studyon.dto.Account
 import com.skynet.studyon.dto.UserDto
+import com.skynet.studyon.dto.UserWithRating
 import com.skynet.studyon.model.User
 import com.skynet.studyon.service.StudyService
 import org.springframework.http.ResponseEntity
@@ -19,6 +20,9 @@ class UserControllerImpl(
 
     override fun getUsersList(): ResponseEntity<List<User>> =
             ResponseEntity.ok(studyService.getUsersList())
+
+    override fun gerUsersListByRating(): ResponseEntity<List<UserWithRating>> =
+            ResponseEntity.ok(studyService.getUserListByRating())
 
     override fun getUser(id: String): ResponseEntity<User> =
             ResponseEntity.ok(studyService.getUserById(id))
