@@ -9,6 +9,11 @@ spring:
       authentication-database: admin
 
 server:
+  ssl:
+    key-store-password: 12345678
+    key-alias: ssl-studyon
+    key-store: classpath:studyon.p12
+    key-store-type: PKCS12
   port: 8080
 
 app:
